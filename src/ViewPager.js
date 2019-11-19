@@ -102,11 +102,15 @@ export default class ViewPager extends PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
+    console.log('state changed :: ', this.props.pageWidth, '  new State :: ',nextProps.pageWidth)
     const newDataSource = [...this._prepareData(nextProps.data || [])]
-    if (newDataSource.length !== this.state.dataSource.length || nextProps.pageWidth !== this.props.pageWidth){
-      this.contentContainerStyle = {
-        width: nextProps.pageWidth * newDataSource.length,
-      }
+    // if (newDataSource.length !== this.state.dataSource.length || nextProps.pageWidth !== this.props.pageWidth){
+    //   this.contentContainerStyle = {
+    //     width: nextProps.pageWidth * newDataSource.length,
+    //   }
+    // }
+    this.contentContainerStyle = {
+      width: nextProps.pageWidth * newDataSource.length,
     }
     this.setState({
       dataSource: newDataSource,
@@ -232,7 +236,7 @@ export default class ViewPager extends PureComponent {
       if (roundedIndex === 0) return this.state.dataSource.length - 1
       if (roundedIndex === this.state.dataSource.length - 1) return 1
     }
-    const pageNumber = this.state.dataSource[roundedIndex] ? this.state.dataSource[roundedIndex]._pageNumber : 1
+    const pageNumber = this.state.dataSource[roundedIndex] ? this.state.dataSource[roundedIndex]._pageNumber : 0
     return pageNumber
   }
 
@@ -304,6 +308,7 @@ export default class ViewPager extends PureComponent {
 
   _onPageChange = () => {
     if (this.pageIndexBeforeDrag !== this.pageIndex || Object.keys(this.props.initialPage).length > 0) {
+      console.log('page change :: ',this._getPageNumberByIndex(this.pageIndex))
       const pageNumber = this._getPageNumberByIndex(this.pageIndex)
       this.pageIndexBeforeDrag = this.pageIndex
       this.props.onPageChange(pageNumber)
@@ -332,7 +337,7 @@ export default class ViewPager extends PureComponent {
   }
 
   _triggerOnPageChange = () => {
-    if (!this.props.firePageChangeIfPassedScreenCenter && this.scrollIndex % 1 < 0.03) {
+    if (!this.props.firePageChangeIfPassedScreenCenter && this.scrollIndex % 1 < 0.02) {
       this._onPageChange()
     } else if (
       (this.pageIndexBeforeDrag + 0.5 < this.scrollIndex ||
