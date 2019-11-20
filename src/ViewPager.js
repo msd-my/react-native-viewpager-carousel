@@ -103,6 +103,7 @@ export default class ViewPager extends PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
+    VIEWPORT_WIDTH = Dimensions.get('window').width
     const newDataSource = [...this._prepareData(nextProps.data || [])]
     if (newDataSource.length !== this.state.dataSource.length || nextProps.pageWidth !== this.props.pageWidth){
       this.contentContainerStyle = {
@@ -145,10 +146,9 @@ export default class ViewPager extends PureComponent {
   }
 
   scrollToPage = pageNumber => {
-    console.log(((pageNumber - 1) + this.thresholdPages) * VIEWPORT_WIDTH, '----scroll to page', VIEWPORT_WIDTH)
     this._scrollTo({
       animated: true,
-      x: ((pageNumber - 1) + this.thresholdPages) * VIEWPORT_WIDTH,
+      x: ((pageNumber) + this.thresholdPages) * VIEWPORT_WIDTH,
     })
   }
 
@@ -306,7 +306,6 @@ export default class ViewPager extends PureComponent {
   }
 
   _onPageChange = () => {
-    console.log('before ::',this.pageIndexBeforeDrag , '     :: page index:: ',this.pageIndex)
     if (this.pageIndexBeforeDrag !== this.pageIndex || Object.keys(this.props.initialPage).length > 0) {
       const pageNumber = this._getPageNumberByIndex(this.pageIndex)
       this.pageIndexBeforeDrag = this.pageIndex
@@ -336,7 +335,7 @@ export default class ViewPager extends PureComponent {
   }
 
   _triggerOnPageChange = () => {
-    if (!this.props.firePageChangeIfPassedScreenCenter && this.scrollIndex % 1 < 0.023) {
+    if (!this.props.firePageChangeIfPassedScreenCenter && this.scrollIndex % 1 < 0.03) {
       this._onPageChange()
     } else if (
       (this.pageIndexBeforeDrag + 0.5 < this.scrollIndex ||
