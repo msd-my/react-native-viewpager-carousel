@@ -10,7 +10,7 @@ import Mirror, { scrollviewBootstrap } from 'react-native-mirror'
 import Page from './Page'
 
 
-const VIEWPORT_WIDTH = Dimensions.get('window').width
+let VIEWPORT_WIDTH = Dimensions.get('window').width
 
 export default class ViewPager extends PureComponent {
 
@@ -89,6 +89,7 @@ export default class ViewPager extends PureComponent {
   }
 
   componentDidMount() {
+    VIEWPORT_WIDTH = Dimensions.get('window').width
     setTimeout(() => {
       if (this.props.renderAsCarousel && Object.keys(this.props.initialPage).length === 0) {
         this._scrollTo({
@@ -96,7 +97,7 @@ export default class ViewPager extends PureComponent {
           animated: false,
         })
       } else {
-        this.scrollToPageWithKeyValuePair(this.props.initialPage)
+        this.scrollToPage(this.props.initialPage)
       }
     }, 0)
   }
@@ -144,6 +145,7 @@ export default class ViewPager extends PureComponent {
   }
 
   scrollToPage = pageNumber => {
+    console.log(((pageNumber - 1) + this.thresholdPages) * VIEWPORT_WIDTH, '----scroll to page', VIEWPORT_WIDTH)
     this._scrollTo({
       animated: true,
       x: ((pageNumber - 1) + this.thresholdPages) * VIEWPORT_WIDTH,
@@ -269,10 +271,9 @@ export default class ViewPager extends PureComponent {
     this.props.onScroll(offsetX)
 
     this.scrollIndex = this._getCurrentScrollIndex(offsetX)
-    // fire onPageChange if the dragged page passed half of the screen
-    this._triggerOnPageChange()
+    
 
-    if (this.props.renderAsCarousel && this.scrollIndex % 1 < 0.03) {
+    if (this.props.renderAsCarousel && this.scrollIndex % 1 < 0.025) {
       if (Math.trunc(this.scrollIndex) === 0) {
 
         offsetX = VIEWPORT_WIDTH * (this.state.dataSource.length - 2)
@@ -299,9 +300,13 @@ export default class ViewPager extends PureComponent {
     }, 50)
 
     this.pageIndex = Math.round(this.scrollIndex)
+
+    // fire onPageChange if the dragged page passed half of the screen
+    this._triggerOnPageChange()
   }
 
   _onPageChange = () => {
+    console.log('before ::',this.pageIndexBeforeDrag , '     :: page index:: ',this.pageIndex)
     if (this.pageIndexBeforeDrag !== this.pageIndex || Object.keys(this.props.initialPage).length > 0) {
       const pageNumber = this._getPageNumberByIndex(this.pageIndex)
       this.pageIndexBeforeDrag = this.pageIndex
@@ -331,7 +336,7 @@ export default class ViewPager extends PureComponent {
   }
 
   _triggerOnPageChange = () => {
-    if (!this.props.firePageChangeIfPassedScreenCenter && this.scrollIndex % 1 < 0.025) {
+    if (!this.props.firePageChangeIfPassedScreenCenter && this.scrollIndex % 1 < 0.023) {
       this._onPageChange()
     } else if (
       (this.pageIndexBeforeDrag + 0.5 < this.scrollIndex ||
@@ -469,3 +474,4 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
 })
+
