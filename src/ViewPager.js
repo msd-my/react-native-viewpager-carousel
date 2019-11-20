@@ -271,7 +271,8 @@ export default class ViewPager extends PureComponent {
     this.props.onScroll(offsetX)
 
     this.scrollIndex = this._getCurrentScrollIndex(offsetX)
-    
+    // fire onPageChange if the dragged page passed half of the screen
+    this._triggerOnPageChange()
 
     if (this.props.renderAsCarousel && this.scrollIndex % 1 < 0.025) {
       if (Math.trunc(this.scrollIndex) === 0) {
@@ -297,12 +298,11 @@ export default class ViewPager extends PureComponent {
 
     this._onMomentumScrollEndTimeout = setTimeout(() => {
       this._onMomentumScrollEnd()
-    }, 50)
+    }, 30)
 
     this.pageIndex = Math.round(this.scrollIndex)
 
-    // fire onPageChange if the dragged page passed half of the screen
-    this._triggerOnPageChange()
+    
   }
 
   _onPageChange = () => {
@@ -335,7 +335,7 @@ export default class ViewPager extends PureComponent {
   }
 
   _triggerOnPageChange = () => {
-    if (!this.props.firePageChangeIfPassedScreenCenter && this.scrollIndex % 1 < 0.03) {
+    if (!this.props.firePageChangeIfPassedScreenCenter && this.scrollIndex % 1 < 0.02) {
       this._onPageChange()
     } else if (
       (this.pageIndexBeforeDrag + 0.5 < this.scrollIndex ||
